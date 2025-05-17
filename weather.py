@@ -1,14 +1,16 @@
 import requests
 
+
 def get_coordinates(location):
-  url = f"https://geocoding-api.open-meteo.com/v1/search?name={location}"
-  response = requests.get(url)
-  data = response.json()
-  first_result = data['results'][0]
-  return first_result['latitude'], first_result['longitude']
+    url = f"https://geocoding-api.open-meteo.com/v1/search?name={location}"
+    response = requests.get(url)
+    data = response.json()
+    first_result = data["results"][0]
+    return first_result["latitude"], first_result["longitude"]
+
 
 def get_current_weather(lat, lon):
-  url = (
+    url = (
         f"https://api.open-meteo.com/v1/forecast?"
         f"latitude={lat}&longitude={lon}"
         f"&current_weather=true"
@@ -17,5 +19,5 @@ def get_current_weather(lat, lon):
         f"&forecast_days=3"
         f"&timezone=auto"
     )
-  response = requests.get(url)
-  return response.json()
+    response = requests.get(url)
+    return response.json()
