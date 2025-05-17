@@ -8,6 +8,14 @@ def get_coordinates(location):
   return first_result['latitude'], first_result['longitude']
 
 def get_current_weather(lat, lon):
-  url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
+  url = (
+        f"https://api.open-meteo.com/v1/forecast?"
+        f"latitude={lat}&longitude={lon}"
+        f"&current_weather=true"
+        f"&hourly=temperature_2m,weather_code"
+        f"&daily=temperature_2m_max,temperature_2m_min,weather_code"
+        f"&forecast_days=3"
+        f"&timezone=auto"
+    )
   response = requests.get(url)
-  return response.json()['current_weather']
+  return response.json()
