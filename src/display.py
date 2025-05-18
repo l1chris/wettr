@@ -1,10 +1,11 @@
 from datetime import datetime
 
-from rich import print
+from rich import box, print
+from rich.align import Align
 from rich.panel import Panel
 from rich.table import Table
 
-from utils import get_icon, get_weekday
+from utils import get_ascii_title, get_icon, get_weekday
 
 
 def show_current_weather(data):
@@ -13,7 +14,32 @@ def show_current_weather(data):
     temp = current["temperature"]
     wind = current["windspeed"]
 
-    print(Panel(f"[bold]Now:[/bold]  {icon}  {temp}°C\n[bold]Wind:[/bold] {wind} km/h"))
+    ascii_title = get_ascii_title()
+    ascii_block = Align(ascii_title, align="center", vertical="middle")
+
+    table = Table.grid(expand=True)
+    table.add_column(ratio=1)
+    table.add_column(ratio=1)
+
+    left_text = (
+        f"\n"
+        f"[bold]Weather in Oldenburg, Germany \n"
+        f"\n"
+        f"Now:[bold]  {icon}  {temp}°C \n"
+        f"Wind:[bold] {wind} km/h"
+    )
+
+    table.add_row(left_text, ascii_block)
+
+    panel = Panel(
+        table,
+        # title="[bold blue]Current Weather[/bold blue]",
+        title="[bold]Current Weather[/bold]",
+        # border_style="blue",
+        title_align="left",
+        width=80,
+    )
+    print(panel)
 
 
 def show_hourly_forecast(data):
@@ -35,16 +61,18 @@ def show_hourly_forecast(data):
     temps = data["hourly"]["temperature_2m"][index_before_now : index_before_now + 8]
     codes = data["hourly"]["weather_code"][index_before_now : index_before_now + 8]
 
-    table = Table(title="Today")
-    table.add_column("Time")
-    table.add_column("Temp")
-    table.add_column("Weather")
+    table = Table(width=75, box=box.MINIMAL)
+    table.add_column("Time", width=25)
+    table.add_column("Temp", width=25)
+    table.add_column("Weather", width=25, justify="center")
 
     for t, temp, code in zip(times, temps, codes):
         hour = t.split("T")[1][:5]
         table.add_row(hour, f"{temp}°C", get_icon(code))
 
-    print(table)
+    panel = Panel(table, title="[bold]Today[/bold]", title_align="left", width=80)
+
+    print(panel)
 
 
 def show_daily_forecast(data):
@@ -53,14 +81,16 @@ def show_daily_forecast(data):
     mins = data["daily"]["temperature_2m_min"][:3]
     codes = data["daily"]["weather_code"][:3]
 
-    table = Table(title="Forecast")
-    table.add_column("Day")
-    table.add_column("Min/Max")
-    table.add_column("Weather")
+    table = Table(width=75, box=box.MINIMAL)
+    table.add_column("Day", width=25)
+    table.add_column("Min/Max", width=25)
+    table.add_column("Weather", width=25, justify="center")
 
     for d, tmin, tmax, code in zip(days, mins, maxs, codes):
         dt = datetime.fromisoformat(d)
         day = get_weekday(dt.weekday())
         table.add_row(day, f"{tmin}°C / {tmax}°C", get_icon(code))
 
-    print(table)
+    panel = Panel(table, title="[bold]Forecast[/bold]", title_align="left", width=80)
+
+    print(panel)

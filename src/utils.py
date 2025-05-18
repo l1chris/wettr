@@ -36,3 +36,13 @@ def get_weekday(number):
         return "Sat"
     elif number == 6:
         return "Sun"
+
+
+def get_ascii_title():
+    return r"""
+                   __    __         
+ _      __  ___   / /_  / /_   _____
+| | /| / / / _ \ / __/ / __/  / ___/
+| |/ |/ / /  __// /_  / /_   / /    
+|__/|__/  \___/ \__/  \__/  /_/                                        
+"""
