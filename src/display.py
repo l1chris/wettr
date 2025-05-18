@@ -76,20 +76,22 @@ def show_hourly_forecast(data):
 
 
 def show_daily_forecast(data):
-    days = data["daily"]["time"][:3]
-    maxs = data["daily"]["temperature_2m_max"][:3]
-    mins = data["daily"]["temperature_2m_min"][:3]
-    codes = data["daily"]["weather_code"][:3]
+    days = data["daily"]["time"][1:4]
+    maxs = data["daily"]["temperature_2m_max"][1:4]
+    mins = data["daily"]["temperature_2m_min"][1:4]
+    codes = data["daily"]["weather_code"][1:4]
+
+    weekdays = [get_weekday(datetime.fromisoformat(d).weekday()) for d in days]
 
     table = Table(width=75, box=box.MINIMAL)
-    table.add_column("Day", width=25)
-    table.add_column("Min/Max", width=25)
-    table.add_column("Weather", width=25, justify="center")
+    for weekday in weekdays:
+        table.add_column(weekday, width=25, justify="center")
 
-    for d, tmin, tmax, code in zip(days, mins, maxs, codes):
-        dt = datetime.fromisoformat(d)
-        day = get_weekday(dt.weekday())
-        table.add_row(day, f"{tmin}°C / {tmax}°C", get_icon(code))
+    icons = [get_icon(code) for code in codes]
+    temps = [f"{tmin}°C / {tmax}°C" for tmin, tmax in zip(mins, maxs)]
+
+    table.add_row(*icons)
+    table.add_row(*temps)
 
     panel = Panel(table, title="[bold]Forecast[/bold]", title_align="left", width=80)
 

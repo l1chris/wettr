@@ -16,7 +16,7 @@ def get_current_weather(lat, lon):
         f"&current_weather=true"
         f"&hourly=temperature_2m,weather_code"
         f"&daily=temperature_2m_max,temperature_2m_min,weather_code"
-        f"&forecast_days=3"
+        f"&forecast_days=4"
         f"&timezone=auto"
     )
     response = requests.get(url)
