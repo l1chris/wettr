@@ -23,7 +23,7 @@ def show_current_weather(data):
 
     left_text = (
         f"\n"
-        f"[bold]Weather in Oldenburg, Germany \n"
+        f"[bold]Oldenburg, Germany \n"
         f"\n"
         f"Now:[bold]  {icon}  {temp}°C \n"
         f"Wind:[bold] {wind} km/h"
@@ -62,13 +62,16 @@ def show_hourly_forecast(data):
     codes = data["hourly"]["weather_code"][index_before_now : index_before_now + 8]
 
     table = Table(width=75, box=box.MINIMAL)
-    table.add_column("Time", width=25)
-    table.add_column("Temp", width=25)
-    table.add_column("Weather", width=25, justify="center")
 
-    for t, temp, code in zip(times, temps, codes):
-        hour = t.split("T")[1][:5]
-        table.add_row(hour, f"{temp}°C", get_icon(code))
+    for time in times:
+        hour = time.split("T")[1][:5]
+        table.add_column(hour, width=5, justify="center")
+
+    icons = [get_icon(code) for code in codes]
+    temps = [f"{temp}°C" for temp in temps]
+
+    table.add_row(*icons)
+    table.add_row(*temps)
 
     panel = Panel(table, title="[bold]Today[/bold]", title_align="left", width=80)
 
@@ -84,6 +87,7 @@ def show_daily_forecast(data):
     weekdays = [get_weekday(datetime.fromisoformat(d).weekday()) for d in days]
 
     table = Table(width=75, box=box.MINIMAL)
+
     for weekday in weekdays:
         table.add_column(weekday, width=25, justify="center")
 
