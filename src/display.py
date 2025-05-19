@@ -8,8 +8,8 @@ from rich.table import Table
 from utils import get_ascii_title, get_icon, get_weekday
 
 
-def show_current_weather(data):
-    current = data["current_weather"]
+def show_current_weather(location_data, weather_data):
+    current = weather_data["current_weather"]
     icon = get_icon(current["weathercode"])
     temp = current["temperature"]
     wind = current["windspeed"]
@@ -21,9 +21,12 @@ def show_current_weather(data):
     table.add_column(ratio=1)
     table.add_column(ratio=1)
 
+    city = location_data["city"]
+    country = location_data["country"]
+
     left_text = (
         f"\n"
-        f"[bold]Oldenburg, Germany \n"
+        f"[bold]{city}, {country} \n"
         f"\n"
         f"Now:[bold]  {icon}  {temp}°C \n"
         f"Wind:[bold] {wind} km/h"

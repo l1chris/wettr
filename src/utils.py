@@ -1,3 +1,22 @@
+import requests
+
+
+def get_location_from_ip():
+    try:
+        res = requests.get("https://ipwho.is", timeout=5)
+        data = res.json()
+        if data.get("success"):
+            return {
+                "city": data["city"],
+                "country": data["country"],
+                "lat": data["latitude"],
+                "lon": data["longitude"],
+            }
+    except Exception:
+        pass
+    return None
+
+
 def get_icon(code):
     if code == 0:
         return "☀️"
