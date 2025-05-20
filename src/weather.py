@@ -6,7 +6,7 @@ def get_coordinates(location):
     response = requests.get(url)
     data = response.json()
     first_result = data["results"][0]
-    return first_result["latitude"], first_result["longitude"]
+    return first_result["latitude"], first_result["longitude"], first_result["country"]
 
 
 def get_current_weather(lat, lon):

@@ -68,7 +68,7 @@ def show_hourly_forecast(data):
 
     for time in times:
         hour = time.split("T")[1][:5]
-        table.add_column(hour, width=5, justify="center")
+        table.add_column(hour, justify="center")
 
     icons = [get_icon(code) for code in codes]
     temps = [f"{temp}°C" for temp in temps]
