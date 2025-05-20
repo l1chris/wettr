@@ -1,4 +1,5 @@
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from rich import box, print
 from rich.align import Align
@@ -46,19 +47,28 @@ def show_current_weather(location_data, weather_data):
 
 
 def show_hourly_forecast(data):
+    tzinfo = ZoneInfo(data["timezone"])
+    current_time = datetime.now(tz=tzinfo)
 
-    current_time = datetime.now()
+    offset_hours = int(current_time.utcoffset().total_seconds() / 3600)
 
     hourly_times = data["hourly"]["time"]
 
     index_before_now = -1
 
     for i in range(len(hourly_times)):
-        time = datetime.fromisoformat(hourly_times[i])
+        timestr = hourly_times[i]
+        time = (
+            datetime.fromisoformat(timestr)
+            .replace(tzinfo=ZoneInfo("UTC"))
+            .astimezone(tzinfo)
+        )
         if time < current_time:
             index_before_now = i
         else:
             break  # since times are sorted, we can stop here
+
+    index_before_now += offset_hours
 
     times = data["hourly"]["time"][index_before_now : index_before_now + 8]
     temps = data["hourly"]["temperature_2m"][index_before_now : index_before_now + 8]

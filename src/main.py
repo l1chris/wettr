@@ -1,4 +1,5 @@
 import argparse
+
 from display import show_current_weather, show_daily_forecast, show_hourly_forecast
 from utils import get_location_from_ip
 from weather import get_coordinates, get_current_weather
@@ -18,7 +19,7 @@ def main():
         location = {"city": args.city, "country": country, "lat": lat, "lon": lon}
     else:
         location = get_location_from_ip()
-    
+
     weather = get_current_weather(location["lat"], location["lon"])
 
     show_current_weather(location, weather)
