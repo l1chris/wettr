@@ -57,11 +57,13 @@ def show_hourly_forecast(weather_data, in_fahrenheit=False):
     tzinfo = ZoneInfo(weather_data["timezone"])
     current_time = datetime.now(tz=tzinfo)
 
-    current_hour = current_time.hour
+    curr = current_time.hour
+    last = curr + 9
 
-    times = weather_data["hourly"]["time"][current_hour : current_hour + 8]
-    temps = weather_data["hourly"]["temperature_2m"][current_hour : current_hour + 8]
-    codes = weather_data["hourly"]["weather_code"][current_hour : current_hour + 8]
+    # Get every 2nd entry starting from the current time
+    times = weather_data["hourly"]["time"][curr:last:2]
+    temps = weather_data["hourly"]["temperature_2m"][curr:last:2]
+    codes = weather_data["hourly"]["weather_code"][curr:last:2]
 
     table = Table(width=75, box=box.MINIMAL)
 
