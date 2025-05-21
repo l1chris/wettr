@@ -15,6 +15,10 @@ def show_current_weather(location_data, weather_data):
     temp = current["temperature"]
     wind = current["windspeed"]
 
+    tzinfo = ZoneInfo(weather_data["timezone"])
+    current_time = datetime.now(tz=tzinfo)
+    formatted_time = current_time.strftime("%H:%M")
+
     ascii_title = get_ascii_title()
     ascii_block = Align(ascii_title, align="center", vertical="middle")
 
@@ -30,7 +34,8 @@ def show_current_weather(location_data, weather_data):
         f"[bold]{city}, {country} \n"
         f"\n"
         f"Now:[bold]  {icon}  {temp}°C \n"
-        f"Wind:[bold] {wind} km/h"
+        f"Wind:[bold] {wind} km/h \n"
+        f"Local time: {formatted_time}"
     )
 
     table.add_row(left_text, ascii_block)
@@ -46,33 +51,15 @@ def show_current_weather(location_data, weather_data):
     print(panel)
 
 
-def show_hourly_forecast(data):
-    tzinfo = ZoneInfo(data["timezone"])
+def show_hourly_forecast(weather_data):
+    tzinfo = ZoneInfo(weather_data["timezone"])
     current_time = datetime.now(tz=tzinfo)
 
-    offset_hours = int(current_time.utcoffset().total_seconds() / 3600)
+    current_hour = current_time.hour
 
-    hourly_times = data["hourly"]["time"]
-
-    index_before_now = -1
-
-    for i in range(len(hourly_times)):
-        timestr = hourly_times[i]
-        time = (
-            datetime.fromisoformat(timestr)
-            .replace(tzinfo=ZoneInfo("UTC"))
-            .astimezone(tzinfo)
-        )
-        if time < current_time:
-            index_before_now = i
-        else:
-            break  # since times are sorted, we can stop here
-
-    index_before_now += offset_hours
-
-    times = data["hourly"]["time"][index_before_now : index_before_now + 8]
-    temps = data["hourly"]["temperature_2m"][index_before_now : index_before_now + 8]
-    codes = data["hourly"]["weather_code"][index_before_now : index_before_now + 8]
+    times = weather_data["hourly"]["time"][current_hour : current_hour + 8]
+    temps = weather_data["hourly"]["temperature_2m"][current_hour : current_hour + 8]
+    codes = weather_data["hourly"]["weather_code"][current_hour : current_hour + 8]
 
     table = Table(width=75, box=box.MINIMAL)
 
@@ -91,11 +78,11 @@ def show_hourly_forecast(data):
     print(panel)
 
 
-def show_daily_forecast(data):
-    days = data["daily"]["time"][1:4]
-    maxs = data["daily"]["temperature_2m_max"][1:4]
-    mins = data["daily"]["temperature_2m_min"][1:4]
-    codes = data["daily"]["weather_code"][1:4]
+def show_daily_forecast(weather_data):
+    days = weather_data["daily"]["time"][1:4]
+    maxs = weather_data["daily"]["temperature_2m_max"][1:4]
+    mins = weather_data["daily"]["temperature_2m_min"][1:4]
+    codes = weather_data["daily"]["weather_code"][1:4]
 
     weekdays = [get_weekday(datetime.fromisoformat(d).weekday()) for d in days]
 
