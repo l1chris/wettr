@@ -2,7 +2,10 @@
 
 A visually appealing and simple command-line weather app built in Python using the [Open-Meteo API](https://open-meteo.com/). Displays current, hourly, and 3-day forecasts with emojis.
 
-<img src="docs/Screenshot.png" alt="screenshot" width="200"/>
+<p align="center">
+  <img src="docs/Screenshot.png" alt="screenshot" width="800"/>
+</p>
+
 
 ## ✨ Features
 
