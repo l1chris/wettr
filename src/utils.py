@@ -17,7 +17,7 @@ def get_location_from_ip():
     return None
 
 
-def get_icon(code):
+def get_icon(code: int):
     if code == 0:
         return "☀️"
     elif code in [1, 2]:
@@ -40,7 +40,7 @@ def get_icon(code):
         return "❓"
 
 
-def get_weekday(number):
+def get_weekday(number: int):
     if number == 0:
         return "Mon"
     elif number == 1:
@@ -65,3 +65,7 @@ def get_ascii_title():
     | |/ |/ //  __// /_ / /_ / /    
     |__/|__/ \___/ \__/ \__//_/                                        
 """
+
+
+def to_fahrenheit(celsius: float):
+    return round(celsius * 9 / 5 + 32, 1)

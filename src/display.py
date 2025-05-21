@@ -6,10 +6,10 @@ from rich.align import Align
 from rich.panel import Panel
 from rich.table import Table
 
-from utils import get_ascii_title, get_icon, get_weekday
+from utils import get_ascii_title, get_icon, get_weekday, to_fahrenheit
 
 
-def show_current_weather(location_data, weather_data):
+def show_current_weather(location_data, weather_data, in_fahrenheit=False):
     current = weather_data["current_weather"]
     icon = get_icon(current["weathercode"])
     temp = current["temperature"]
@@ -29,11 +29,13 @@ def show_current_weather(location_data, weather_data):
     city = location_data["city"]
     country = location_data["country"]
 
+    temp_converted = f"{to_fahrenheit(temp)}°F" if in_fahrenheit else f"{temp}°C"
+
     left_text = (
         f"\n"
         f"[bold]{city}, {country} \n"
         f"\n"
-        f"Now:[bold]  {icon}  {temp}°C \n"
+        f"Now:[bold]  {icon}  {temp_converted} \n"
         f"Wind:[bold] {wind} km/h \n"
         f"Local time: {formatted_time}"
     )
@@ -51,7 +53,7 @@ def show_current_weather(location_data, weather_data):
     print(panel)
 
 
-def show_hourly_forecast(weather_data):
+def show_hourly_forecast(weather_data, in_fahrenheit=False):
     tzinfo = ZoneInfo(weather_data["timezone"])
     current_time = datetime.now(tz=tzinfo)
 
@@ -68,17 +70,19 @@ def show_hourly_forecast(weather_data):
         table.add_column(hour, justify="center")
 
     icons = [get_icon(code) for code in codes]
-    temps = [f"{temp}°C" for temp in temps]
+    temps_converted = [
+        f"{to_fahrenheit(temp)}°F" if in_fahrenheit else f"{temp}°C" for temp in temps
+    ]
 
     table.add_row(*icons)
-    table.add_row(*temps)
+    table.add_row(*temps_converted)
 
     panel = Panel(table, title="[bold]Today[/bold]", title_align="left", width=80)
 
     print(panel)
 
 
-def show_daily_forecast(weather_data):
+def show_daily_forecast(weather_data, in_fahrenheit=False):
     days = weather_data["daily"]["time"][1:4]
     maxs = weather_data["daily"]["temperature_2m_max"][1:4]
     mins = weather_data["daily"]["temperature_2m_min"][1:4]
@@ -92,7 +96,13 @@ def show_daily_forecast(weather_data):
         table.add_column(weekday, width=25, justify="center")
 
     icons = [get_icon(code) for code in codes]
-    temps = [f"{tmin}°C / {tmax}°C" for tmin, tmax in zip(mins, maxs)]
+    maxs_converted = [
+        f"{to_fahrenheit(max)}°F" if in_fahrenheit else f"{max}°C" for max in maxs
+    ]
+    mins_converted = [
+        f"{to_fahrenheit(min)}°F" if in_fahrenheit else f"{min}°C" for min in mins
+    ]
+    temps = [f"{tmin} / {tmax}" for tmin, tmax in zip(mins_converted, maxs_converted)]
 
     table.add_row(*icons)
     table.add_row(*temps)
