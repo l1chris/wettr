@@ -6,7 +6,7 @@ from rich.align import Align
 from rich.panel import Panel
 from rich.table import Table
 
-from utils import get_ascii_title, get_icon, get_weekday, to_fahrenheit
+from weather_cli.utils import get_ascii_title, get_icon, get_weekday, to_fahrenheit
 
 
 def show_current_weather(location_data, weather_data, in_fahrenheit=False):
@@ -44,9 +44,7 @@ def show_current_weather(location_data, weather_data, in_fahrenheit=False):
 
     panel = Panel(
         table,
-        # title="[bold blue]Current Weather[/bold blue]",
         title="[bold]Current Weather[/bold]",
-        # border_style="blue",
         title_align="left",
         width=80,
     )

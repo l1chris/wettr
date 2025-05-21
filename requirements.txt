@@ -17,4 +17,5 @@ pyflakes==3.3.2
 Pygments==2.19.1
 requests==2.32.3
 rich==14.0.0
+setuptools==80.8.0
 urllib3==2.4.0

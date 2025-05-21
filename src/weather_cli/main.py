@@ -1,8 +1,12 @@
 import argparse
 
-from display import show_current_weather, show_daily_forecast, show_hourly_forecast
-from utils import get_location_from_ip
-from weather import get_coordinates, get_current_weather
+from weather_cli.display import (
+    show_current_weather,
+    show_daily_forecast,
+    show_hourly_forecast,
+)
+from weather_cli.utils import get_location_from_ip
+from weather_cli.weather import get_coordinates, get_current_weather
 
 
 def parse_args():
