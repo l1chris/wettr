@@ -16,7 +16,7 @@ A visually appealing and simple command-line weather app built in Python using t
 
 ## 📦 Installation
 
-You can install with with pip:
+You can install with pip:
 
 ```bash
 pip install .
