@@ -1,7 +1,18 @@
+import logging
+from typing import Dict, Optional
+
 import requests
 
+logger = logging.getLogger(__name__)
 
-def get_location_from_ip():
+
+def get_location_from_ip() -> Optional[Dict[str, any]]:
+    """
+    Get location information based on IP address.
+
+    Returns:
+        Dictionary with city, country, lat, lon if successful, None otherwise.
+    """
     try:
         res = requests.get("https://ipwho.is", timeout=5)
         data = res.json()
@@ -12,9 +23,27 @@ def get_location_from_ip():
                 "lat": data["latitude"],
                 "lon": data["longitude"],
             }
-    except Exception:
-        pass
-    return None
+        else:
+            # API returned success=false, log the reason if available
+            logger.error(
+                f"Location lookup failed: {data.get('message', 'Unknown error')}"
+            )
+            return None
+    except requests.exceptions.Timeout:
+        logger.error("Error: Request timed out while fetching location")
+        return None
+    except requests.exceptions.ConnectionError:
+        logger.error("Error: Could not connect to location service")
+        return None
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"Error: HTTP error occurred: {e}")
+        return None
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error: Request failed: {e}")
+        return None
+    except (KeyError, ValueError) as e:
+        logger.error(f"Error: Invalid response format: {e}")
+        return None
 
 
 def get_icon(code: int):
