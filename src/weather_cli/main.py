@@ -1,5 +1,6 @@
 import argparse
 import logging
+import sys
 
 from weather_cli.display import (
     show_current_weather,
@@ -20,19 +21,21 @@ def parse_args():
 
 
 def main():
-    logging.basicConfig(filename="main.log", level=logging.INFO)
+    logging.basicConfig(filename="main.log")
     args = parse_args()
 
     if args.city:
-        lat, lon, country = get_coordinates(args.city)
-        location = {"city": args.city, "country": country, "lat": lat, "lon": lon}
+        location = get_coordinates(args.city)
     else:
         location = get_location_from_ip()
         if not location:
             print("Could not auto-detect location.")
             city = input("Enter city name: ")
-            lat, lon, country = get_coordinates(city)
-            location = {"city": args.city, "country": country, "lat": lat, "lon": lon}
+            location = get_coordinates(city)
+
+    if not location:
+        print("Error: Could not retrieve location data for city.")
+        sys.exit(1)
 
     weather = get_current_weather(location["lat"], location["lon"])
 
