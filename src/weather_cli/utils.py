@@ -1,28 +1,43 @@
 import logging
-from typing import Dict, Optional
+from dataclasses import dataclass
+from typing import Optional
 
 import requests
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
 
-def get_location_from_ip() -> Optional[Dict[str, any]]:
+class IPWhoIsData(BaseModel):
+    success: bool
+    city: str
+    country: str
+    latitude: float
+    longitude: float
+
+
+@dataclass
+class Geodata:
+    city: str
+    country: str
+    lat: float
+    lon: float
+
+
+def get_coordinates_for_ip() -> Optional[Geodata]:
     """
-    Get location information based on IP address.
+    Get coordinates and geo information for an IP address.
 
     Returns:
-        Dictionary with city, country, lat, lon if successful, None otherwise.
+        Instance of Geodata if successful, None otherwise.
     """
     try:
-        res = requests.get("https://ipwho.is", timeout=5)
-        data = res.json()
-        if data.get("success"):
-            return {
-                "city": data["city"],
-                "country": data["country"],
-                "lat": data["latitude"],
-                "lon": data["longitude"],
-            }
+        response = requests.get("https://ipwho.is", timeout=5)
+
+        data = IPWhoIsData.model_validate_json(response.text)
+
+        if data.success:
+            return Geodata(data.city, data.country, data.latitude, data.longitude)
         else:
             # API returned success=false, log the reason if available
             logger.error(

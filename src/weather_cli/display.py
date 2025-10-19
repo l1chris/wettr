@@ -6,11 +6,19 @@ from rich.align import Align
 from rich.panel import Panel
 from rich.table import Table
 
-from weather_cli.utils import get_ascii_title, get_icon, get_weekday, to_fahrenheit
+from weather_cli.utils import (
+    Geodata,
+    get_ascii_title,
+    get_icon,
+    get_weekday,
+    to_fahrenheit,
+)
 from weather_cli.weather import WeatherData
 
 
-def show_current_weather(location_data, weather_data: WeatherData, in_fahrenheit=False):
+def show_current_weather(
+    geo_data: Geodata, weather_data: WeatherData, in_fahrenheit=False
+):
     icon = get_icon(weather_data.current_weather.weathercode)
     temp = weather_data.current_weather.temperature
     wind = weather_data.current_weather.windspeed
@@ -26,8 +34,8 @@ def show_current_weather(location_data, weather_data: WeatherData, in_fahrenheit
     table.add_column(ratio=1)
     table.add_column(ratio=1)
 
-    city = location_data["city"]
-    country = location_data["country"]
+    city = geo_data.city
+    country = geo_data.country
 
     temp_converted = f"{to_fahrenheit(temp)}°F" if in_fahrenheit else f"{temp}°C"
 

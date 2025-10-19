@@ -1,10 +1,18 @@
 import logging
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 import requests
 from pydantic import BaseModel, Field, ValidationError
 
+from weather_cli.utils import Geodata
+
 logger = logging.getLogger(__name__)
+
+
+class CoordinateData(BaseModel):
+    country: str
+    latitude: float
+    longitude: float
 
 
 class CurrentData(BaseModel):
@@ -33,7 +41,7 @@ class WeatherData(BaseModel):
     daily: DailyData
 
 
-def get_coordinates(city: str) -> Optional[Dict[str, any]]:
+def get_coordinates_for_city(city: str) -> Optional[Geodata]:
     """
     Get coordinates and country for a given city name.
 
@@ -41,14 +49,14 @@ def get_coordinates(city: str) -> Optional[Dict[str, any]]:
         city: Name of the city to look up
 
     Returns:
-        Dictionary with city, country, lat, lon if successful, None otherwise.
+        Instance of Geodata if successful, None otherwise.
     """
     if not city:
         print("Error: No city name provided")
         return None
 
     try:
-        url = f"https://geocoding-api.open-meteo.com/v1/search?name={city}"
+        url = f"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=1"
         response = requests.get(url, timeout=5)
         response.raise_for_status()
 
@@ -59,19 +67,11 @@ def get_coordinates(city: str) -> Optional[Dict[str, any]]:
             return None
 
         first_result = data["results"][0]
+        first_result = CoordinateData.model_validate(first_result)
 
-        # Validate that required fields exist
-        required_fields = ["latitude", "longitude", "country"]
-        if not all(field in first_result for field in required_fields):
-            print("Error: Invalid response format from geocoding API")
-            return None
-
-        return {
-            "city": city,
-            "country": first_result["country"],
-            "lat": first_result["latitude"],
-            "lon": first_result["longitude"],
-        }
+        return Geodata(
+            city, first_result.country, first_result.latitude, first_result.longitude
+        )
 
     except requests.exceptions.Timeout:
         logger.error("Error: Request timed out while looking up city")
@@ -85,12 +85,12 @@ def get_coordinates(city: str) -> Optional[Dict[str, any]]:
     except requests.exceptions.RequestException as e:
         logger.error(f"Error: Request failed: {e}")
         return None
-    except (KeyError, IndexError, ValueError) as e:
-        logger.error(f"Error: Could not parse geocoding response: {e}")
+    except ValidationError as e:
+        logger.error(f"Error: Response validation failed: {e}")
         return None
 
 
-def get_current_weather(lat: str, lon: str) -> Optional[WeatherData]:
+def get_current_weather(lat: float, lon: float) -> Optional[WeatherData]:
     """
     Get weather information for a latitude and longitude.
 
