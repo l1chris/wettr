@@ -7,15 +7,15 @@ from rich.panel import Panel
 from rich.table import Table
 
 from weather_cli.utils import get_ascii_title, get_icon, get_weekday, to_fahrenheit
+from weather_cli.weather import WeatherData
 
 
-def show_current_weather(location_data, weather_data, in_fahrenheit=False):
-    current = weather_data["current_weather"]
-    icon = get_icon(current["weathercode"])
-    temp = current["temperature"]
-    wind = current["windspeed"]
+def show_current_weather(location_data, weather_data: WeatherData, in_fahrenheit=False):
+    icon = get_icon(weather_data.current_weather.weathercode)
+    temp = weather_data.current_weather.temperature
+    wind = weather_data.current_weather.windspeed
 
-    tzinfo = ZoneInfo(weather_data["timezone"])
+    tzinfo = ZoneInfo(weather_data.timezone)
     current_time = datetime.now(tz=tzinfo)
     formatted_time = current_time.strftime("%H:%M")
 
@@ -51,17 +51,17 @@ def show_current_weather(location_data, weather_data, in_fahrenheit=False):
     print(panel)
 
 
-def show_hourly_forecast(weather_data, in_fahrenheit=False):
-    tzinfo = ZoneInfo(weather_data["timezone"])
+def show_hourly_forecast(weather_data: WeatherData, in_fahrenheit=False):
+    tzinfo = ZoneInfo(weather_data.timezone)
     current_time = datetime.now(tz=tzinfo)
 
     curr = current_time.hour
     last = curr + 9
 
     # Get every 2nd entry starting from the current time
-    times = weather_data["hourly"]["time"][curr:last:2]
-    temps = weather_data["hourly"]["temperature_2m"][curr:last:2]
-    codes = weather_data["hourly"]["weather_code"][curr:last:2]
+    times = weather_data.hourly.time[curr:last:2]
+    temps = weather_data.hourly.temperature_2m[curr:last:2]
+    codes = weather_data.hourly.weather_code[curr:last:2]
 
     table = Table(width=75, box=box.MINIMAL)
 
@@ -82,11 +82,11 @@ def show_hourly_forecast(weather_data, in_fahrenheit=False):
     print(panel)
 
 
-def show_daily_forecast(weather_data, in_fahrenheit=False):
-    days = weather_data["daily"]["time"][1:4]
-    maxs = weather_data["daily"]["temperature_2m_max"][1:4]
-    mins = weather_data["daily"]["temperature_2m_min"][1:4]
-    codes = weather_data["daily"]["weather_code"][1:4]
+def show_daily_forecast(weather_data: WeatherData, in_fahrenheit=False):
+    days = weather_data.daily.time[1:4]
+    maxs = weather_data.daily.temperature_2m_max[1:4]
+    mins = weather_data.daily.temperature_2m_max[1:4]
+    codes = weather_data.daily.weather_code[1:4]
 
     weekdays = [get_weekday(datetime.fromisoformat(d).weekday()) for d in days]
 

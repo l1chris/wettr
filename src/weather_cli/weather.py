@@ -1,9 +1,36 @@
 import logging
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 import requests
+from pydantic import BaseModel, Field, ValidationError
 
 logger = logging.getLogger(__name__)
+
+
+class CurrentData(BaseModel):
+    temperature: float
+    windspeed: float
+    weathercode: int
+
+
+class HourlyData(BaseModel):
+    time: List[str]
+    temperature_2m: List[float] = Field(..., alias="temperature_2m")
+    weather_code: List[int]
+
+
+class DailyData(BaseModel):
+    time: List[str]
+    temperature_2m_max: List[float] = Field(..., alias="temperature_2m_max")
+    temperature_2m_min: List[float] = Field(..., alias="temperature_2m_min")
+    weather_code: List[int]
+
+
+class WeatherData(BaseModel):
+    timezone: str
+    current_weather: CurrentData
+    hourly: HourlyData
+    daily: DailyData
 
 
 def get_coordinates(city: str) -> Optional[Dict[str, any]]:
@@ -63,15 +90,50 @@ def get_coordinates(city: str) -> Optional[Dict[str, any]]:
         return None
 
 
-def get_current_weather(lat, lon):
-    url = (
-        f"https://api.open-meteo.com/v1/forecast?"
-        f"latitude={lat}&longitude={lon}"
-        f"&current_weather=true"
-        f"&hourly=temperature_2m,weather_code"
-        f"&daily=temperature_2m_max,temperature_2m_min,weather_code"
-        f"&forecast_days=4"
-        f"&timezone=auto"
-    )
-    response = requests.get(url)
-    return response.json()
+def get_current_weather(lat: str, lon: str) -> Optional[WeatherData]:
+    """
+    Get weather information for a latitude and longitude.
+
+    Args:
+        lat: Latitude value
+        lon: Longitude value
+
+    Returns:
+        WeatherData, None otherwise.
+    """
+    if not lat or not lon:
+        logger.error("Error: No latitude or longitude provided")
+        return None
+
+    try:
+        url = (
+            f"https://api.open-meteo.com/v1/forecast?"
+            f"latitude={lat}&longitude={lon}"
+            f"&current_weather=true"
+            f"&hourly=temperature_2m,weather_code"
+            f"&daily=temperature_2m_max,temperature_2m_min,weather_code"
+            f"&forecast_days=4"
+            f"&timezone=auto"
+        )
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+
+        data = WeatherData.model_validate_json(response.text)
+
+        return data
+
+    except requests.exceptions.Timeout:
+        logger.error("Error: Request timed out while looking up city")
+        return None
+    except requests.exceptions.ConnectionError:
+        logger.error("Error: Could not connect to open meteo")
+        return None
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"Error: HTTP error occurred: {e}")
+        return None
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error: Request failed: {e}")
+        return None
+    except ValidationError as e:
+        logger.error(f"Error: Response validation failed: {e}")
+        return None

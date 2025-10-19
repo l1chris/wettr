@@ -8,7 +8,7 @@ from weather_cli.display import (
     show_hourly_forecast,
 )
 from weather_cli.utils import get_location_from_ip
-from weather_cli.weather import get_coordinates, get_current_weather
+from weather_cli.weather import WeatherData, get_coordinates, get_current_weather
 
 
 def parse_args():
@@ -37,7 +37,11 @@ def main():
         print("Error: Could not retrieve location data for city.")
         sys.exit(1)
 
-    weather = get_current_weather(location["lat"], location["lon"])
+    weather: WeatherData = get_current_weather(location["lat"], location["lon"])
+
+    if not weather:
+        print("Error: Could not retrieve weather data for location.")
+        sys.exit(1)
 
     if args.f:
         show_current_weather(location, weather, True)
