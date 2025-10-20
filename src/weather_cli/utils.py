@@ -1,6 +1,5 @@
 import logging
 from dataclasses import dataclass
-from typing import Optional
 
 import requests
 from pydantic import BaseModel
@@ -24,7 +23,7 @@ class Geodata:
     lon: float
 
 
-def get_coordinates_for_ip() -> Optional[Geodata]:
+def get_coordinates_for_ip() -> Geodata | None:
     """
     Get coordinates and geo information for an IP address.
 
@@ -61,7 +60,7 @@ def get_coordinates_for_ip() -> Optional[Geodata]:
         return None
 
 
-def get_icon(code: int):
+def get_icon(code: int) -> str:
     if code == 0:
         return "☀️"
     elif code in [1, 2]:
@@ -84,7 +83,7 @@ def get_icon(code: int):
         return "❓"
 
 
-def get_weekday(number: int):
+def get_weekday(number: int) -> str:
     if number == 0:
         return "Mon"
     elif number == 1:
@@ -111,5 +110,5 @@ def get_ascii_title():
 """
 
 
-def to_fahrenheit(celsius: float):
+def to_fahrenheit(celsius: float) -> float:
     return round(celsius * 9 / 5 + 32, 1)

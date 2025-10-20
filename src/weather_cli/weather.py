@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional
+from typing import List
 
 import requests
 from pydantic import BaseModel, Field, ValidationError
@@ -41,7 +41,7 @@ class WeatherData(BaseModel):
     daily: DailyData
 
 
-def get_coordinates_for_city(city: str) -> Optional[Geodata]:
+def get_coordinates_for_city(city: str) -> Geodata | None:
     """
     Get coordinates and country for a given city name.
 
@@ -90,7 +90,7 @@ def get_coordinates_for_city(city: str) -> Optional[Geodata]:
         return None
 
 
-def get_current_weather(lat: float, lon: float) -> Optional[WeatherData]:
+def get_current_weather(lat: float, lon: float) -> WeatherData | None:
     """
     Get weather information for a latitude and longitude.
 
