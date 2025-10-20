@@ -1,4 +1,23 @@
-from weather_cli.utils import to_fahrenheit
+from unittest.mock import Mock, patch
+
+from weather_cli.utils import Geodata, get_coordinates_for_ip, to_fahrenheit
+
+
+@patch("weather_cli.utils.requests.get")
+def test_success_get_coordinates_for_ip(mock_get):
+    """Test successful coordinate lookup"""
+    mock_response = Mock()
+    mock_response.text = (
+        '{"success": true, "city": "Oldenburg", "country": "Germany", '
+        '"latitude": 53.14, "longitude": 8.21}'
+    )
+    mock_get.return_value = mock_response
+
+    result = get_coordinates_for_ip()
+
+    assert isinstance(result, Geodata)
+    assert result.city == "Oldenburg"
+    assert result.country == "Germany"
 
 
 def test_to_fahrenheit():
