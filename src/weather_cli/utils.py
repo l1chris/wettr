@@ -38,10 +38,7 @@ def get_coordinates_for_ip() -> Geodata | None:
         if data.success:
             return Geodata(data.city, data.country, data.latitude, data.longitude)
         else:
-            # API returned success=false, log the reason if available
-            logger.error(
-                f"Location lookup failed: {data.get('message', 'Unknown error')}"
-            )
+            logger.error("Error: Unknown error occurred while fetching location")
             return None
     except requests.exceptions.Timeout:
         logger.error("Error: Request timed out while fetching location")
